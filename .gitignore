@@ -1,0 +1,31 @@
+# Compiled object files
+*.o
+
+# Compiled dynamic libraries
+*.so
+
+# Compiled static libraries
+*.a
+
+# Executable files
+*.out
+*.exe
+
+# Debug files
+*.dSYM/
+*.dmp
+
+# Temporary files
+*.tmp
+*.temp
+
+# Backup files
+*.bak
+*.swp
+
+# IDE specific files
+.vscode/
+.idea/
+
+# pastas do projeto
+testes/
