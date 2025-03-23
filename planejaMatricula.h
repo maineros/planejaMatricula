@@ -1,5 +1,8 @@
 #ifndef PLANEJAMATRICULA_H
 #define PLANEJAMATRICULA_H
+#include <stdbool.h>
+#include "aluno.h"
+#include "disciplinas.h"
 
 // le o nome do aluno de maneira circular para garantir a efetividade do calculo
 void leNomesComCircularidade(const char *nomeCompleto, char nome1[], char nome2[], char nome3[], char nome4[]);
@@ -22,7 +25,14 @@ const char* calculaEnfase(int peso);
 // decide quantas disciplinas/dia o aluno deve ter e quantos dias/semana o aluno deve comparecer
 const char* encontraDisciplinas(int peso);
 
+// le e divide os nomes do aluno de maneira circular 
+void leNomesComCircularidade(const char *nomeCompleto, char nome1[], char nome2[], char nome3[], char nome4[]);
+
 // verifica se o aluno tem os pre-requisitos para se matricular em uma disciplina
-int verificaPreRequisitos(char *codigo, char historico[][10], int numDisciplinas);
+bool verificaPreRequisitos(Aluno *aluno, Disciplina disciplina);
+
+void reservarHorasFlexiveis(Aluno *aluno);
+
+void planejarSemestre(Aluno *aluno, Disciplina obrigatorias[], int num_obrigatorias);
 
 #endif

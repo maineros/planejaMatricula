@@ -5,6 +5,7 @@
 #include "planejaMatricula.h"
 #include "disciplinas.h"
 #include "letrasValores.h"
+#include "aluno.h"
 
 // nao eh permitido que o aluno esteja matriculado em uma disciplina sem ter seu pre-requisito
 // nao eh permitido que o aluno esteja matriculado em duas disciplinas com choque de horario
@@ -14,8 +15,12 @@ int main()
 {
     char nomeCompleto[] = "daniel araujo albuquerque";
     char nome1[20], nome2[20], nome3[20], nome4[20];
-
     leNomesComCircularidade(nomeCompleto, nome1, nome2, nome3, nome4);
+
+    // char historico[][7] = {"COMP359", "COMP360", "COMP361", "COMP362", "COMP363"};
+
+    Aluno aluno = {1, {}, 0, {}, 0};
+    int num_obrigatorias = sizeof(obrigatorias) / sizeof(obrigatorias[0]);
 
     // DEBUG 
     int peso1 = calculaPeso(nome1);
@@ -28,7 +33,14 @@ int main()
     printf("%s\n", calculaTempoConclusao(peso2));
     printf("%s\n", calculaEnfase(peso2));
     printf("%s\n", encontraDisciplinas(peso1));
+    
     // DEBUG
+    planejarSemestre(&aluno, obrigatorias, num_obrigatorias);
+    reservarHorasFlexiveis(&aluno);
+
+    printf("Disciplinas planejadas para o proximo semestre:\n");
+    for (int i = 0; i < aluno.num_planejadas; i++)
+        printf("%s - %s\n", aluno.planejadas[i].codigo, aluno.planejadas[i].nome_dis);
 
     return 0;
 }
@@ -67,13 +79,10 @@ int obtemValorLetra(char letra)
 {
     int len = strlen(letras);
     for (int i = 0; i < len; i++)
-    {
         if (tolower(letra) == letras[i]) return valores[i]; // retorna o respectivo valor da letra
-    }
-
+    
     return 0;
 }
-
 
 int calculaPeso(char *nome)
 {
@@ -124,7 +133,6 @@ const char* calculaEnfase(int peso)
                              "Sem Enfase"; 
 }
 
-
 const char* encontraDisciplinas(int peso)
 {
     // escolha das disciplinas deve seguir a seguinte orientacao:
@@ -136,4 +144,45 @@ const char* encontraDisciplinas(int peso)
     return (peso % 3 == 0) ? "Menor numero de dias possivel" :
            (peso % 3 == 1) ? "Mesmo turno" :
                              "Nao extrapolar 3 disciplinas/dia, mas ir todos os dias"; 
+}
+
+bool verificaPreRequisitos(Aluno *aluno, Disciplina disciplina)
+{
+    // bubble sort para verificar, para cada disciplina, se o aluno possui os pre-requisitos dela em suas disciplinas cursadas
+    for (int i = 0; i < disciplina.numPreRequisitos; i++) // percorre os pre-requisitos de uma dada disciplina
+    {
+        bool encontrou = false;
+        for (int j = 0; j < aluno->num_cursadas; j++) // verifica, para cada pre-requisito, se o aluno possui essa disciplina p-r cursada
+        {
+            if (strcmp(disciplina.preRequisitos[i], aluno->cursadas[j].codigo) == 0)
+            {
+                encontrou = true;
+                break;
+            }
+        }
+
+        if (!encontrou)
+            return false;
+    }
+    return true;
+}
+
+void reservarHorasFlexiveis(Aluno *aluno)
+{
+    printf("Reservando 2 horas por dia para horas flexíveis.\n");
+}
+
+void planejarSemestre(Aluno *aluno, Disciplina obrigatorias[], int num_obrigatorias)
+{
+    // percorre ate o numero de disciplinas obrigatorias
+    for (int i = 0; i < num_obrigatorias; i++)
+    {
+        if (obrigatorias[i].periodo == aluno->periodo_atual && // verifica se o periodo em que a disciplina eh ofertada no fluxo padrao coincide com o periodo atual do aluno
+            verificaPreRequisitos(aluno, obrigatorias[i]) && // verifica se o aluno possui todos os pre-requisitos de cada disciplina
+            aluno->num_planejadas < 6) // verifica se o numero de materias nao esta extrapolando o max para o aluno
+        {    
+            aluno->planejadas[aluno->num_planejadas] = obrigatorias[i];
+            aluno->num_planejadas++;
+        }
+    }
 }
