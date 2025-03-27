@@ -1,7 +1,8 @@
 #ifndef DISCIPLINAS_H
 #define DISCIPLINAS_H
-#include <stdbool.h> 
-typedef struct {
+#include <stdbool.h>
+typedef struct
+{
     char codigo[10];
     char nome_dis[100];
     int periodo;
@@ -9,50 +10,85 @@ typedef struct {
     int numPreRequisitos;
     char coRequisitos[5][10];
     int numCoRequisitos;
-    char horario[10];
+    char dias[4];
+    char turno;
+    char horarios[5];
     int numHorarios;
     int cargaHoraria;
-    bool enfase;
-    bool eletiva;
-    int tipo;
+    int tipo;     // tipo 0 - obrigatoria; tipo 1 - eletiva; tipo 2 - extensao
 } Disciplina;
 
 Disciplina obrigatorias[] = {
-    {"COMP359", "Programacao 1", 1, {}, 0, {}, 0, "6T3456", 1, 72, false, false, 1},
-    {"COMP360", "Logica para Computacao", 1, {}, 0, {}, 0, "24T34", 2, 72, false, false, 1},
-    {"COMP361", "Computacao, Sociedade e Etica", 1, {}, 0, {}, 0, "24T56", 2, 72, false, false, 1},
-    {"COMP362", "Matematica Discreta", 1, {}, 0, {}, 0, "35T12", 2, 72, false, false, 1},
-    {"COMP363", "Calculo Diferencial e Integral", 1, {}, 0, {}, 0, "35T3456", 2, 144, false, false, 1},
+    // 1o periodo
+    {"COMP359", "ProgramaÁ„o 1", 1, {}, 0, {}, 0, "6", 'T', "3456", 1, 72, 0},
+    {"COMP360", "LÛgica para ComputaÁ„o", 1, {}, 0, {}, 0, "24", 'T', "34", 2, 72, 0},
+    {"COMP361", "ComputaÁ„o, Sociedade e …tica", 1, {}, 0, {}, 0, "24", 'T', "56", 2, 72, 0},
+    {"COMP362", "Matem·tica Discreta", 1, {}, 0, {}, 0, "35", 'T', "12", 2, 72, 0},
+    {"COMP363", "C·lculo Diferencial e Integral", 1, {}, 0, {}, 0, "35", 'T', "3456", 2, 144, 0},
 
-    {"COMP364", "Estrutura de Dados", 2, {"COMP359"}, 1, {}, 0, "35M56", 2, 72, false, false, 1},
-    {"COMP365", "Banco de Dados", 2, {}, 0, {}, 0, "24T12", 2, 72, false, false, 1},
-    {"COMP366", "Organizacao e Arquitetura de Computadores", 2, {}, 0, {}, 0, "35M34", 2, 72, false, false, 1},
-    {"COMP367", "Geometria Analitica", 2, {}, 0, {}, 0, "24T34", 2, 72, false, false, 1},
+    // 2o periodo
+    {"COMP364", "Estrutura de Dados", 2, {"COMP359"}, 1, {}, 0, "35", 'M', "56", 2, 72, 0},
+    {"COMP365", "Banco de Dados", 2, {}, 0, {}, 0, "24", 'T', "12", 2, 72, 0},
+    {"COMP366", "OrganizaÁ„o e Arquitetura de Computadores", 2, {}, 0, {}, 0, "35", 'M', "34", 2, 72, 0},
+    {"COMP367", "Geometria AnalÌtica", 2, {}, 0, {}, 0, "24", 'T', "34", 2, 72, 0},
 
-    {"COMP368", "Redes de Computadores", 3, {"COMP359"}, 1, {}, 0, "24T34", 2, 72, false, false, 1},
-    {"COMP369", "Teoria dos Grafos", 3, {"COMP364", "COMP362"}, 2, {}, 0, "25T12", 2, 72, false, false, 1},
-    {"COMP370", "Probabilidade e Estat√≠stica", 3, {"COMP363"}, 1, {}, 0, "24M56", 2, 72, false, false, 1},
-    {"COMP371", "√Ålgebra Linear", 3, {"COMP367"}, 1, {}, 0, "24M34", 2, 72, false, false, 1},
+    // 3o periodo
+    {"COMP368", "Redes de Computadores", 3, {"COMP359"}, 1, {}, 0, "24", 'T', "34", 2, 72, 0},
+    {"COMP369", "Teoria dos Grafos", 3, {"COMP364", "COMP362"}, 2, {}, 0, "25", 'T', "12", 2, 72, 0},
+    {"COMP370", "Probabilidade e EstatÌstica", 3, {"COMP363"}, 1, {}, 0, "24", 'M', "56", 2, 72, 0},
+    {"COMP371", "¡lgebra Linear", 3, {"COMP367"}, 1, {}, 0, "24", 'M', "34", 2, 72, 0},
 
-    {"COMP372", "Programa√ß√£o 2", 4, {"COMP364", "COMP365", "COMP368"}, 3, {"COMP373"}, 1, "4T3456", 1, 72, false, false, 1},
-    {"COMP373", "Programa√ß√£o 3", 4, {"COMP364", "COMP365", "COMP368"}, 3, {"COMP372"}, 1, "35T34", 2, 72, false, false, 1},
-    {"COMP374", "Projeto e An√°lise de Algoritmos", 4, {"COMP364", "COMP369"}, 2, {}, 0, "24T56", 2, 72, false, false, 1},
-    {"COMP376", "Teoria da Computa√ß√£o", 4, {}, 0, {}, 0, "24T12", 2, 72, false, false, 1},
+    // 4o periodo
+    {"COMP372", "ProgramaÁ„o 2", 4, {"COMP364", "COMP365", "COMP368"}, 3, {"COMP373"}, 1, "4", 'T', "3456", 1, 72, 0},
+    {"COMP373", "ProgramaÁ„o 3", 4, {"COMP364", "COMP365", "COMP368"}, 3, {"COMP372"}, 1, "35", 'T', "34", 2, 72, 0},
+    {"COMP374", "Projeto e An·lise de Algoritmos", 4, {"COMP364", "COMP369"}, 2, {}, 0, "24", 'T', "56", 2, 72, 0},
+    {"COMP376", "Teoria da ComputaÁ„o", 4, {}, 0, {}, 0, "24", 'T', "12", 2, 72, 0},
 
-    {"COMP378", "Sistemas Operacionais", 5, {"COMP366"}, 1, {}, 0, "24T12", 2, 72, false, false, 1},
-    {"COMP379", "Compiladores", 5, {"COMP364", "COMP376"}, 2, {}, 0, "24T34", 2, 72, false, false, 1},
-    {"COMP380", "Intelig√™ncia Artificial", 5, {"COMP360", "COMP374"}, 2, {}, 0, "35T34", 2, 72, false, false, 1},
-    {"COMP381", "Computa√ß√£o Gr√°fica", 5, {}, 0, {}, 0, "35T56", 2, 72, false, false, 1},
+    // 5o periodo
+    {"COMP378", "Sistemas Operacionais", 5, {"COMP366"}, 1, {}, 0, "24", 'T', "12", 2, 72, 0},
+    {"COMP379", "Compiladores", 5, {"COMP364", "COMP376"}, 2, {}, 0, "24", 'T', "34", 2, 72, 0},
+    {"COMP380", "InteligÍncia Artificial", 5, {"COMP360", "COMP374"}, 2, {}, 0, "35", 'T', "34", 2, 72, 0},
+{"COMP381", "ComputaÁ„o Gr·fica", 5, {}, 0, {}, 0, "35", 'T', "56", 2, 72, 0},
 
-    {"COMP382", "Projeto e Desenvolvimento de Sistemas", 6, {}, 0, {}, 0, "245M3456", 3, 288, false, false, 1},
+    // 6o periodo
+    {"COMP382", "Projeto e Desenvolvimento de Sistemas", 6, {}, 0, {}, 0, "245", 'M', "3456", 3, 288, 0},
 
-    {"COMP386", "Metodologia de Pesquisa e Trabalho Individual", 7, {}, 0, {}, 0, "35T12", 2, 72, false, false, 1},
-    {"COMP387", "No√ß√µes de Direito", 7, {}, 0, {}, 0, "3T3456", 1, 72, false, false, 1},
+    // 7o periodo
+    {"COMP386", "Metodologia de Pesquisa e Trabalho Individual", 7, {}, 0, {}, 0, "35", 'T', "12", 2, 72, 0},
+    {"COMP387", "NoÁıes de Direito", 7, {}, 0, {}, 0, "3", 'T', "3456", 1, 72, 0},
+    };
+
+int NUM_OBRIGATORIAS = sizeof(obrigatorias) / sizeof(Disciplina);
+
+Disciplina extensao[] = {
+    {"COMP377", "ACE 1: Projeto 1", 4, {}, 0, {}, 0, "6", 'T', "12", 1, 57, 2},
+    {"COMP383", "ACE 2: Continuidade do projeto 1", 5, {}, 0, {}, 0, "6", 'T', "34", 1, 57, 2},
+    {"COMP384", "ACE 3: Projeto 2", 6, {}, 0, {}, 0, "5", 'T', "12", 1, 57, 2},
+    {"COMP383", "ACE 4: Continuidade do projeto 2", 7, {}, 0, {}, 0, "5", 'T', "345", 1, 47, 2},
+    {"COMP385", "ACE 5: Evento", 8, {}, 0, {}, 0, "5", 'T', "56", 1, 57, 2}
 };
 
-// Disciplina enfase[]
-// {
+int NUM_EXTENSAO = sizeof(extensao)/sizeof(Disciplina);
 
-// }
+Disciplina eletivas[] = {
+    {"COMP389", "Conceitos de Linguagem de ProgramaÁ„o", 0, {}, 0, {}, 0, "", 'T', "", 0, 72, 1},
+    {"COMP390", "Aprendizagem de M·quina", 0, {"COMP404"}, 1, {}, 0, "", 0, 72, 1},
+    {"COMP391", "Sistemas Digitais", 0, {"COMP404"}, 1, {}, 0, "", 0, 72, 1},
+    {"COMP392", "Sistemas DistribuÌdos", 0, {}, 0, {}, 0, "", 0, 72, 1},
+    {"COMP393", "FPGA", 0, {}, 0, {}, 0, "", 0, 72, 1}, // por algum motivo fpga e redes neurais possuem o mesmo codigo de disciplina no ppc
+    {"COMP393", "Redes Neurais e Aprendizado Profundo", 0, {}, 0, {}, 0, "", 0, 72, 1},
+    {"COMP395", "InteraÁ„o Homem-M·quina", 0, {"COMP373"}, 1, {}, 0, "", 0, 72, 1},
+    {"COMP396", "Processamento Digital de Imagens", 0, {"COMP381"}, 1, {}, 0, "", 0, 72, 1},
+    {"COMP397", "ComputaÁ„o Evolucion·ria", 0, {}, 0, {}, 0, "", 0, 72, 1},
+    {"COMP398", "Sistemas Embarcados", 0, {}, 0, {}, 0, "", 0, 72, 1},
+    {"COMP399", "GerÍncia de Projeto", 0, {"COMP382"}, 1, {}, 0, "", 0, 72, 1},
+    {"COMP400", "Vis„o Computacional", 0, {}, 0, {}, 0, "", 0, 72, 1},
+    {"COMP401", "CiÍncia de Dados", 0, {"COMP370"}, 1, {}, 0, "", 0, 72, 1},
+    {"COMP402", "Microcoontroladores e AplicaÁıes", 0, {}, 0, {}, 0, "", 0, 72, 1},
+    {"COMP403", "SeguranÁa de Sistemas Computacionais", 0, {"COMP368"}, 1, {}, 0, "", 0, 72, 1},
+    {"COMP404", "C·lculo 3", 0, {"COMP363"}, 1, {}, 0, "", 0, 72, 1}
+};
+
+int NUM_ELETIVAS = sizeof(eletivas)/sizeof(Disciplina);
 
 #endif
