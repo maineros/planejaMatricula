@@ -2,12 +2,27 @@
 #define ALUNO_H
 #include "disciplinas.h"
 
-typedef struct {
-    int periodo_atual;
-    Disciplina cursadas[100];
-    int num_cursadas;
+int TOTAL_OBRIGATORIAS = 2376;
+int TOTAL_ELETIVAS = 576;
+int TOTAL_EXTENSAO = 240;
+int TOTAL_COMPLEMENTARES = 375;
+typedef struct
+{
+    char codigo[10];
+    double mediaFinal;
+    bool trancada;
+} Historico;
+typedef struct
+{
+    int periodoAtual;
+    Historico cursadas[100];
+    int numCursadas;
     Disciplina planejadas[6];
-    int num_planejadas;
+    int numPlanejadas;
+    int horasCumpridasObrigatorias;
+    int horasCumpridasEletivas;
+    int horasCumpridasExtensao;
+    int horasCumpridasComplementares;
 } Aluno;
 
 #endif
