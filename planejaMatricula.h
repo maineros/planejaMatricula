@@ -4,35 +4,31 @@
 #include "aluno.h"
 #include "disciplinas.h"
 
-// le o nome do aluno de maneira circular para garantir a efetividade do calculo
-void leNomesComCircularidade(const char *nomeCompleto, char nome1[], char nome2[], char nome3[], char nome4[]);
+// Limpa o buffer de entrada para que não sejam recebidos caracteres de outras entradas anteriores.
+void limparBuffer();
 
-// atribui a cada letra do nome do aluno o seu respectivo valor tabelado
-int obtemValorLetra(char letra);
+// Recebe os dados básicos de histórico do discente.
+int entrada(Historico *historico, int i);
 
-// efetua um somatorio para encontrar o peso/valor de cada nome do aluno
-int calculaPeso(char *nome);
-
-// calcula em quantas disciplinas o aluno pode se matricular no semestre
-int calculaLimiteDisciplinas(int peso);
-
-// calcula em quanto tempo o aluno devera finalizar a graduacao
-const char* calculaTempoConclusao(int peso);
-
-// decide a enfase que o aluno deve fazer
-const char* calculaEnfase(int peso);
-
-// decide quantas disciplinas/dia o aluno deve ter e quantos dias/semana o aluno deve comparecer
-const char* encontraDisciplinas(int peso);
-
-// le e divide os nomes do aluno de maneira circular 
-void leNomesComCircularidade(const char *nomeCompleto, char nome1[], char nome2[], char nome3[], char nome4[]);
-
-// verifica se o aluno tem os pre-requisitos para se matricular em uma disciplina
+// Verifica se o discente possui as disciplinas pre-réquisito de uma outra disciplina cursadas com nota suficiente.
 bool verificaPreRequisitos(Aluno *aluno, Disciplina disciplina);
 
-void reservarHorasFlexiveis(Aluno *aluno);
+// Verifica se o discente está com no máximo 3 disciplinas/dia. 
+bool verificaMax3PorDia(Aluno *aluno);
 
+// Verifica se uma disciplina já foi cursada com nota suficiente pelo discente.
+bool disciplinaJaCursada(Aluno *aluno, Disciplina disciplina);
+
+// Planeja o semestre do discente.
 void planejarSemestre(Aluno *aluno, Disciplina obrigatorias[], int num_obrigatorias);
+
+// Verifica para quais dias da semana o discente possui aulas planejadas.
+void extrairDiasSemana(char horario[], bool dias[5]);
+
+// Verifica se o discente possui disciplinas em todos os dias da semana.
+bool verificaDiasSemana(Aluno *aluno);
+
+// Verifica se uma disciplina a ser adicionada possui choque de horário com alguma disciplina previamente planejada.
+bool haChoqueHorario(Aluno *aluno, char turno, char dias[5], char horarios[6]);
 
 #endif
