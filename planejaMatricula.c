@@ -1,158 +1,166 @@
 #include <stdio.h>
 #include <string.h>
-#include <stdlib.h>
+#include <stdbool.h>
 #include <ctype.h>
-#include "planejaMatricula.h"
-#include "disciplinas.h"
-#include "letrasValores.h"
+#include <locale.h>
 #include "aluno.h"
+#include "disciplinas.h"
+#include "planejaMatricula.h"
 
-// nao eh permitido que o aluno esteja matriculado em uma disciplina sem ter seu pre-requisito
-// nao eh permitido que o aluno esteja matriculado em duas disciplinas com choque de horario
-// eh obrigatorio que o aluno esteja matriculado em pelo menos uma disciplina
+// Carga Horária Mínima:	3747h
+// Carga Horária Máxima por Período Letivo: 540h
+// 2.952 horas de disciplina geral divido em:
+// 2.376 horas de disciplinas obrigatórias e 576 horas em (8) eletivas
+// 180 de TCC
+// 240 de Atividades Complementares
+// 375 de Atividades de Extensão
 
 int main()
 {
-    char nomeCompleto[] = "daniel araujo albuquerque";
-    char nome1[20], nome2[20], nome3[20], nome4[20];
-    leNomesComCircularidade(nomeCompleto, nome1, nome2, nome3, nome4);
+    setlocale(LC_ALL, "Portuguese_Brazil");
 
-    // char historico[][7] = {"COMP359", "COMP360", "COMP361", "COMP362", "COMP363"};
+    Aluno aluno;
+    printf("Qual o preiodo atual: ");
+    scanf("%d", &aluno.periodoAtual);
 
-    Aluno aluno = {1, {}, 0, {}, 0};
-    int num_obrigatorias = sizeof(obrigatorias) / sizeof(obrigatorias[0]);
+    limparBuffer();
 
-    // DEBUG 
-    int peso1 = calculaPeso(nome1);
-    int peso2 = calculaPeso(nome2);
-    int peso3 = calculaPeso(nome3);
+    int tamanho = entrada(aluno.cursadas, 0);
+    aluno.numCursadas = tamanho;
+    aluno.numPlanejadas = 0, aluno.horasCumpridasObrigatorias = 0, aluno.horasCumpridasEletivas = 0, aluno.horasCumpridasExtensao = 0, aluno.horasCumpridasComplementares = 0;
 
-    printf("pesos = %d %d %d\n", peso1, peso2, peso3);
+    planejarSemestre(&aluno, obrigatorias, NUM_OBRIGATORIAS);
 
-    printf("%d\n", calculaLimiteDisciplinas(peso1));
-    printf("%s\n", calculaTempoConclusao(peso2));
-    printf("%s\n", calculaEnfase(peso2));
-    printf("%s\n", encontraDisciplinas(peso1));
-    
-    // DEBUG
-    planejarSemestre(&aluno, obrigatorias, num_obrigatorias);
-    reservarHorasFlexiveis(&aluno);
+    printf("\nDisciplinas planejadas para o próximo semestre: ");
+    printf("%d\n", aluno.numPlanejadas);
 
-    printf("Disciplinas planejadas para o proximo semestre:\n");
-    for (int i = 0; i < aluno.num_planejadas; i++)
-        printf("%s - %s\n", aluno.planejadas[i].codigo, aluno.planejadas[i].nome_dis);
+    for (int i = 0; i < aluno.numPlanejadas; i++)
+        printf("%s - %s (%s%c%s)\n", aluno.planejadas[i].codigo, aluno.planejadas[i].nome_dis, aluno.planejadas[i].dias, aluno.planejadas[i].turno, aluno.planejadas[i].horarios);
+
+    printf("\nCom o encerramento do semestre, a situação do discente será a seguinte:\n");
+    printf("- HORAS PAGAS EM DISCIPLINAS OBRIGATÓRIAS: %dh\n- HORAS FALTANTES EM DISCIPLINAS OBRIGATÓRIAS: %dh\n", aluno.horasCumpridasObrigatorias, TOTAL_OBRIGATORIAS - aluno.horasCumpridasObrigatorias);
+    printf("- HORAS PAGAS EM DISCIPLINAS ELETIVAS: %dh\n- HORAS FALTANTES EM DISCIPLINAS ELETIVAS: %dh\n", aluno.horasCumpridasEletivas, TOTAL_ELETIVAS - aluno.horasCumpridasEletivas);
+    printf("- HORAS PAGAS EM EXTENSÃO: %dh\n- HORAS FALTANTES EM EXTENSÃO: %dh\n", aluno.horasCumpridasExtensao, TOTAL_EXTENSAO - aluno.horasCumpridasExtensao);
+    printf("- HORAS COMPLEMENTARES PAGAS: %dh\n- HORAS COMPLEMENTARES FALTANTES: %dh\n", aluno.horasCumpridasComplementares, TOTAL_COMPLEMENTARES - aluno.horasCumpridasComplementares);
+
+    if (!verificaDiasSemana(&aluno))
+        printf("Atenção: O aluno não está indo todos os dias da semana.\n");
+
+    if (!verificaMax3PorDia(&aluno))
+        printf("Atenção: O aluno está excedendo o limite de três disciplinas por dia.\n");
 
     return 0;
 }
 
-void leNomesComCircularidade(const char *nomeCompleto, char nome1[], char nome2[], char nome3[], char nome4[])
+void limparBuffer()
 {
-    // array para armazenar os nomes
-    char nomes[4][20];
-    int i = 0;
-
-    // usando strtok para separar o nome completo em partes
-    char nomeTemp[100];
-    strcpy(nomeTemp, nomeCompleto);  // copia do nome completo para ser usada no strtok
-    char *token = strtok(nomeTemp, " ");  // os nomes serao divididos pelo espaco entre eles
-
-    // preencher os nomes com o maximo de 4 partes
-    while (token != NULL && i < 4) {
-        strcpy(nomes[i], token);
-        token = strtok(NULL, " ");
-        i++;
-    }
-
-    // se tiver menos de 4 nomes, garantir a circularidade
-    for (int j = i; j < 4; j++) {
-        strcpy(nomes[j], nomes[j - i]);
-    }
-
-    // copiando para as variaveis de saida
-    strcpy(nome1, nomes[0]);
-    strcpy(nome2, nomes[1]);
-    strcpy(nome3, nomes[2]);
-    strcpy(nome4, nomes[3]);
+    int c;
+    while ((c = getchar()) != '\n' && c != EOF)
+        ;
 }
 
-int obtemValorLetra(char letra)
+int entrada(Historico *historico, int i)
 {
-    int len = strlen(letras);
-    for (int i = 0; i < len; i++)
-        if (tolower(letra) == letras[i]) return valores[i]; // retorna o respectivo valor da letra
-    
-    return 0;
-}
-
-int calculaPeso(char *nome)
-{
-    int soma = 0;
-
-    for (int i = 0; nome[i] != '\0'; i++)
+    printf("Codigo: ");
+    if (fgets(historico[i].codigo, sizeof(historico[i].codigo), stdin) == NULL)
     {
-        soma += obtemValorLetra(nome[i]);
+        return i;
     }
 
-    return soma;
+    historico[i].codigo[strcspn(historico[i].codigo, "\n")] = '\0';
+
+    if (strcmp(historico[i].codigo, "-2") == 0)
+    {
+        return i;
+    }
+
+    printf("Nota: ");
+
+    if (scanf("%lf", &historico[i].mediaFinal) == 1)
+    {
+        if (historico[i].mediaFinal == -2)
+        {
+            limparBuffer();
+            return i;
+        }
+        else if (historico[i].mediaFinal == -1)
+        {
+            historico[i].trancada = true;
+        }
+    }
+    else
+    {
+        limparBuffer();
+        return i;
+    }
+
+    limparBuffer();
+
+    return entrada(historico, i + 1);
 }
 
-int calculaLimiteDisciplinas(int peso)
+void planejarSemestre(Aluno *aluno, Disciplina obrigatorias[], int num_obrigatorias)
 {
-    // limite maximo de disciplinas por semestre
-    // somar todos os numeros do primeiro nome e dividir por 3; valor do resto:
-    // 0 = maximo 10
-    // 1 = maximo 8
-    // 2 = maximo 6
+    for (int i = 0; i < num_obrigatorias; i++)
+    {
+        if (obrigatorias[i].periodo <= aluno->periodoAtual &&
+            !disciplinaJaCursada(aluno, obrigatorias[i]) &&
+            verificaPreRequisitos(aluno, obrigatorias[i]) &&
+            aluno->numPlanejadas < 6)
+        {
+            // aluno->planejadas[aluno->numPlanejadas] = obrigatorias[i];
+            // aluno->horasCumpridasObrigatorias = aluno->horasCumpridasObrigatorias + obrigatorias[i].cargaHoraria;
+            // aluno->numPlanejadas++;
+            // verificaDiasSemana(aluno);
+            // verificaMax3PorDia(aluno);
 
-    return (peso % 3 == 0) ? 10 : (peso % 3 == 1) ? 8 : 6;
+            Aluno temp = *aluno; // copia temporária para testar a adição
+            temp.planejadas[temp.numPlanejadas] = obrigatorias[i];
+            temp.numPlanejadas++;
+
+            if (!verificaMax3PorDia(&temp))
+                continue; // se exceder o limite, pula para a proxima disciplina
+            
+            // se passar no teste, adiciona a disciplina de verdade
+            aluno->planejadas[aluno->numPlanejadas] = obrigatorias[i];
+            aluno->horasCumpridasObrigatorias += obrigatorias[i].cargaHoraria;
+            aluno->numPlanejadas++;
+        }
+    }
 }
 
-const char* calculaTempoConclusao(int peso)
+bool disciplinaJaCursada(Aluno *aluno, Disciplina disciplina)
 {
-    // tempo no qual o aluno deseja concluir o curso
-    // somar todos os numeros do proximo nome e dividir por 3; valor do resto:
-    // 0: no menor tempo possivel
-    // 1: no maior tempo possivel
-    // 2: tempo medio possivel
-
-    return (peso % 3 == 0) ? "Menor tempo possivel" :
-           (peso % 3 == 1) ? "Maior tempo possivel" :
-                             "Tempo medio possivel";
-}
-
-const char* calculaEnfase(int peso)
-{
-    // escolha das enfases
-    // somar todos os numeros do proximo nome e dividir por 3; valor do resto:
-    // 0: enfase desejada pelo aluno
-    // 1: enfase que diminui o tempo de conclusao de curso pelo aluno
-    // 2: nenhuma enfase
-
-    return (peso % 3 == 0) ? "Enfase desejada pelo aluno" :
-           (peso % 3 == 1) ? "Enfase para menor tempo de conclusao" :
-                             "Sem Enfase"; 
-}
-
-const char* encontraDisciplinas(int peso)
-{
-    // escolha das disciplinas deve seguir a seguinte orientacao:
-    // somar todos os numeros do proximo nome e dividir por 3; valor do resto:
-    // 0: as disciplinas devem ocupar o menor numero de dias possiveis
-    // 1: as disciplinas devem pertencer a um mesmo turno
-    // 2: o aluno nao deve extrapolar o limite de 3 disciplinas por dia, mas deve ir todos os dias a ufal
-
-    return (peso % 3 == 0) ? "Menor numero de dias possivel" :
-           (peso % 3 == 1) ? "Mesmo turno" :
-                             "Nao extrapolar 3 disciplinas/dia, mas ir todos os dias"; 
+    for (int i = 0; i < aluno->numCursadas; i++)
+    {
+        if ((strcmp(aluno->cursadas[i].codigo, disciplina.codigo) == 0) &&
+            aluno->cursadas[i].mediaFinal >= 7 &&
+            aluno->cursadas[i].trancada == false)
+        {
+            switch (disciplina.tipo)
+            {
+            case 0:
+                aluno->horasCumpridasObrigatorias += disciplina.cargaHoraria;
+                break;
+            case 1:
+                aluno->horasCumpridasEletivas += disciplina.cargaHoraria;
+                break;
+            case 2:
+                aluno->horasCumpridasExtensao += disciplina.cargaHoraria;
+                break;
+            }
+            return true;
+        }
+    }
+    return false;
 }
 
 bool verificaPreRequisitos(Aluno *aluno, Disciplina disciplina)
 {
-    // bubble sort para verificar, para cada disciplina, se o aluno possui os pre-requisitos dela em suas disciplinas cursadas
-    for (int i = 0; i < disciplina.numPreRequisitos; i++) // percorre os pre-requisitos de uma dada disciplina
+    for (int i = 0; i < disciplina.numPreRequisitos; i++)
     {
         bool encontrou = false;
-        for (int j = 0; j < aluno->num_cursadas; j++) // verifica, para cada pre-requisito, se o aluno possui essa disciplina p-r cursada
+        for (int j = 0; j < aluno->numCursadas; j++)
         {
             if (strcmp(disciplina.preRequisitos[i], aluno->cursadas[j].codigo) == 0)
             {
@@ -160,29 +168,116 @@ bool verificaPreRequisitos(Aluno *aluno, Disciplina disciplina)
                 break;
             }
         }
-
         if (!encontrou)
             return false;
     }
+
     return true;
 }
 
-void reservarHorasFlexiveis(Aluno *aluno)
+// alterei algumas coisas .mainero
+bool verificaDiasSemana(Aluno *aluno)
 {
-    printf("Reservando 2 horas por dia para horas flexÃ­veis.\n");
-}
+    bool diasSemana[5] = {false};
+    int totalDias = 0;
 
-void planejarSemestre(Aluno *aluno, Disciplina obrigatorias[], int num_obrigatorias)
-{
-    // percorre ate o numero de disciplinas obrigatorias
-    for (int i = 0; i < num_obrigatorias; i++)
+    for (int i = 0; i < aluno->numPlanejadas; i++)
     {
-        if (obrigatorias[i].periodo == aluno->periodo_atual && // verifica se o periodo em que a disciplina eh ofertada no fluxo padrao coincide com o periodo atual do aluno
-            verificaPreRequisitos(aluno, obrigatorias[i]) && // verifica se o aluno possui todos os pre-requisitos de cada disciplina
-            aluno->num_planejadas < 6) // verifica se o numero de materias nao esta extrapolando o max para o aluno
-        {    
-            aluno->planejadas[aluno->num_planejadas] = obrigatorias[i];
-            aluno->num_planejadas++;
+        bool diasPresenca[5] = {false};
+        extrairDiasSemana(aluno->planejadas[i].dias, diasPresenca);
+
+        for (int j = 0; j < 5; j++)
+        {
+            if (diasPresenca[j] && !diasSemana[j])
+            {
+                diasSemana[j] = true;
+                totalDias++;
+
+                if (totalDias == 5) // se todos os dias ja foram cobertos, retorna true imediatamente
+                    return true;
+            }
         }
     }
+
+    return false;
+}
+
+bool verificaMax3PorDia(Aluno *aluno)
+{
+    int contagem[5] = {0};
+
+    for (int i = 0; i < aluno->numPlanejadas; i++)
+    {
+        bool diasPresenca[5] = {false};
+        extrairDiasSemana(aluno->planejadas[i].dias, diasPresenca);
+
+        for (int j = 0; j < 5; j++)
+        {
+            if (diasPresenca[j])
+                contagem[j]++;
+        }
+    }
+
+    for (int i = 0; i < 5; i++)
+    {
+        if (contagem[i] > 3)
+        {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+void extrairDiasSemana(char dias[], bool diasPresenca[5])
+{
+    // resetando os dias
+    for (int i = 0; i < 5; i++)
+        diasPresenca[i] = false;
+
+    for (int i = 0; dias[i] != '\0'; i++)
+    {
+        switch (dias[i])
+        {
+            case '2': diasPresenca[0] = true; break; // segunda
+            case '3': diasPresenca[1] = true; break; // terça
+            case '4': diasPresenca[2] = true; break; // quarta
+            case '5': diasPresenca[3] = true; break; // quinta
+            case '6': diasPresenca[4] = true; break; // sexta
+        }
+    }
+}
+
+bool haChoqueHorario(Aluno *aluno, char turno, char dias[5], char horarios[6]) // ainda nao testada
+{
+    for (int i = 0; i < aluno->numPlanejadas; i++)
+    {
+        Disciplina d = aluno->planejadas[i];
+
+        // se os turnos forem diferentes nao ha choque
+        if (d.turno != turno)
+            continue;
+
+        // verificar se ha dias em comum
+        bool haDiaEmComum = false;
+        for (int j = 0; dias[j] != '\0'; j++)
+        {
+            if (strchr(d.dias, dias[j])) // se algum dia da nova disciplina estiver nos dias ja planejados
+            {
+                haDiaEmComum = true;
+                break;
+            }
+        }
+
+        if (!haDiaEmComum)
+            continue;
+
+        for (int j = 0; horarios[j] != '\0'; j++)
+        {
+            if (strchr(d.horarios, horarios[j])) // se algum horario coincidir
+                return true; // choque encontrado
+        }
+    }
+    
+    return false;
 }
