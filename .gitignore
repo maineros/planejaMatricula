@@ -27,5 +27,6 @@
 .vscode/
 .idea/
 
-# pastas do projeto
+# pastas e arquivos do projeto
+teste.c
 testes/
