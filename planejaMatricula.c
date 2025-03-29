@@ -7,13 +7,13 @@
 #include "disciplinas.h"
 #include "planejaMatricula.h"
 
-// Carga Horária Mínima:	3747h
+// Carga Horária Mínima: 3747h
 // Carga Horária Máxima por Período Letivo: 540h
 // 2.952 horas de disciplina geral divido em:
-// 2.376 horas de disciplinas obrigatórias e 576 horas em (8) eletivas
-// 180 de TCC
-// 240 de Atividades Complementares
-// 375 de Atividades de Extensão
+    // 2.376 horas de disciplinas obrigatórias e 576 horas em (8) eletivas
+    // 180 de TCC
+    // 240 de Atividades Complementares
+    // 375 de Atividades de Extensão
 
 int main()
 {
@@ -25,8 +25,7 @@ int main()
 
     limparBuffer();
 
-    int tamanho = entrada(aluno.cursadas, 0);
-    aluno.numCursadas = tamanho;
+    aluno.numCursadas = entrada(aluno.cursadas, 0);
     aluno.numPlanejadas = 0, aluno.horasCumpridasObrigatorias = 0, aluno.horasCumpridasEletivas = 0, aluno.horasCumpridasExtensao = 0, aluno.horasCumpridasComplementares = 0;
 
     planejarSemestre(&aluno, obrigatorias, NUM_OBRIGATORIAS);
@@ -120,7 +119,7 @@ void planejarSemestre(Aluno *aluno, Disciplina obrigatorias[], int num_obrigator
 
             if (!verificaMax3PorDia(&temp))
                 continue; // se exceder o limite, pula para a proxima disciplina
-            
+
             // se passar no teste, adiciona a disciplina de verdade
             aluno->planejadas[aluno->numPlanejadas] = obrigatorias[i];
             aluno->horasCumpridasObrigatorias += obrigatorias[i].cargaHoraria;
@@ -275,9 +274,9 @@ bool haChoqueHorario(Aluno *aluno, char turno, char dias[5], char horarios[6]) /
         for (int j = 0; horarios[j] != '\0'; j++)
         {
             if (strchr(d.horarios, horarios[j])) // se algum horario coincidir
-                return true; // choque encontrado
+                return true;                     // choque encontrado
         }
     }
-    
+
     return false;
 }

@@ -3,7 +3,7 @@
 #include <stdbool.h>
 typedef struct
 {
-    char codigo[10];
+    char codigo[8];
     char nome_dis[100];
     int periodo;
     char preRequisitos[5][10];
@@ -13,7 +13,7 @@ typedef struct
     char dias[4];
     char turno;
     char horarios[5];
-    int numHorarios;
+    int numDiasSem;
     int cargaHoraria;
     int tipo;     // tipo 0 - obrigatoria; tipo 1 - eletiva; tipo 2 - extensao
 } Disciplina;
@@ -48,7 +48,7 @@ Disciplina obrigatorias[] = {
     {"COMP378", "Sistemas Operacionais", 5, {"COMP366"}, 1, {}, 0, "24", 'T', "12", 2, 72, 0},
     {"COMP379", "Compiladores", 5, {"COMP364", "COMP376"}, 2, {}, 0, "24", 'T', "34", 2, 72, 0},
     {"COMP380", "Inteligência Artificial", 5, {"COMP360", "COMP374"}, 2, {}, 0, "35", 'T', "34", 2, 72, 0},
-{"COMP381", "Computação Gráfica", 5, {}, 0, {}, 0, "35", 'T', "56", 2, 72, 0},
+    {"COMP381", "Computação Gráfica", 5, {}, 0, {}, 0, "35", 'T', "56", 2, 72, 0},
 
     // 6o periodo
     {"COMP382", "Projeto e Desenvolvimento de Sistemas", 6, {}, 0, {}, 0, "245", 'M', "3456", 3, 288, 0},
@@ -72,21 +72,21 @@ int NUM_EXTENSAO = sizeof(extensao)/sizeof(Disciplina);
 
 Disciplina eletivas[] = {
     {"COMP389", "Conceitos de Linguagem de Programação", 0, {}, 0, {}, 0, "", 'T', "", 0, 72, 1},
-    {"COMP390", "Aprendizagem de Máquina", 0, {"COMP404"}, 1, {}, 0, "", 0, 72, 1},
-    {"COMP391", "Sistemas Digitais", 0, {"COMP404"}, 1, {}, 0, "", 0, 72, 1},
-    {"COMP392", "Sistemas Distribuídos", 0, {}, 0, {}, 0, "", 0, 72, 1},
-    {"COMP393", "FPGA", 0, {}, 0, {}, 0, "", 0, 72, 1}, // por algum motivo fpga e redes neurais possuem o mesmo codigo de disciplina no ppc
-    {"COMP393", "Redes Neurais e Aprendizado Profundo", 0, {}, 0, {}, 0, "", 0, 72, 1},
-    {"COMP395", "Interação Homem-Máquina", 0, {"COMP373"}, 1, {}, 0, "", 0, 72, 1},
-    {"COMP396", "Processamento Digital de Imagens", 0, {"COMP381"}, 1, {}, 0, "", 0, 72, 1},
-    {"COMP397", "Computação Evolucionária", 0, {}, 0, {}, 0, "", 0, 72, 1},
-    {"COMP398", "Sistemas Embarcados", 0, {}, 0, {}, 0, "", 0, 72, 1},
-    {"COMP399", "Gerência de Projeto", 0, {"COMP382"}, 1, {}, 0, "", 0, 72, 1},
-    {"COMP400", "Visão Computacional", 0, {}, 0, {}, 0, "", 0, 72, 1},
-    {"COMP401", "Ciência de Dados", 0, {"COMP370"}, 1, {}, 0, "", 0, 72, 1},
-    {"COMP402", "Microcoontroladores e Aplicações", 0, {}, 0, {}, 0, "", 0, 72, 1},
-    {"COMP403", "Segurança de Sistemas Computacionais", 0, {"COMP368"}, 1, {}, 0, "", 0, 72, 1},
-    {"COMP404", "Cálculo 3", 0, {"COMP363"}, 1, {}, 0, "", 0, 72, 1}
+    {"COMP390", "Aprendizagem de Máquina", 0, {"COMP404"}, 1, {}, 0, "", 'T', "", 0, 72, 1},
+    {"COMP391", "Sistemas Digitais", 0, {"COMP404"}, 1, {}, 0, "", 'T', "", 0, 72, 1},
+    {"COMP392", "Sistemas Distribuídos", 0, {}, 0, {}, 0, "", 'T', "", 0, 72, 1},
+    {"COMP393", "FPGA", 0, {}, 0, {}, 0, "", 'T', "", 0, 72, 1}, // por algum motivo fpga e redes neurais possuem o mesmo codigo de disciplina no ppc
+    {"COMP393", "Redes Neurais e Aprendizado Profundo", 0, {}, 0, {}, 0, "", 'T', "", 0, 72, 1},
+    {"COMP395", "Interação Homem-Máquina", 0, {"COMP373"}, 1, {}, 0, "", 'T', "", 0, 72, 1},
+    {"COMP396", "Processamento Digital de Imagens", 0, {"COMP381"}, 1, {}, 0, "", 'T', "", 0, 72, 1},
+    {"COMP397", "Computação Evolucionária", 0, {}, 0, {}, 0, "", 'T', "", 0, 72, 1},
+    {"COMP398", "Sistemas Embarcados", 0, {}, 0, {}, 0, "", 'T', "", 0, 72, 1},
+    {"COMP399", "Gerência de Projeto", 0, {"COMP382"}, 1, {}, 0, "", 'T', "", 0, 72, 1},
+    {"COMP400", "Visão Computacional", 0, {}, 0, {}, 0, "", 'T', "", 0, 72, 1},
+    {"COMP401", "Ciência de Dados", 0, {"COMP370"}, 1, {}, 0, "", 'T', "", 0, 72, 1},
+    {"COMP402", "Microcoontroladores e Aplicações", 0, {}, 0, {}, 0, "", 'T', "", 0, 72, 1},
+    {"COMP403", "Segurança de Sistemas Computacionais", 0, {"COMP368"}, 1, {}, 0, "", 'T', "", 0, 72, 1},
+    {"COMP404", "Cálculo 3", 0, {"COMP363"}, 1, {}, 0, "", 'T', "", 0, 72, 1}
 };
 
 int NUM_ELETIVAS = sizeof(eletivas)/sizeof(Disciplina);
