@@ -7,23 +7,31 @@
 #include "disciplinas.h"
 #include "planejaMatricula.h"
 
-// Carga Hor�ria M�nima: 3747h
-// Carga Hor�ria M�xima por Per�odo Letivo: 540h
+// Carga Horária Mínima: 3747h
+// Carga Horária Máxima por Período Letivo: 540h
 // 2.952 horas de disciplina geral divido em:
-    // 2.376 horas de disciplinas obrigat�rias e 576 horas em (8) eletivas
-    // 180 de TCC
-    // 240 de Atividades Complementares
-    // 375 de Atividades de Extens�o
+// 2.376 horas de disciplinas obrigatórias e 576 horas em (8) eletivas
+// 180 de TCC
+// 240 de Atividades Complementares
+// 375 de Atividades de Extensão
 
 int main()
 {
     setlocale(LC_ALL, "Portuguese_Brazil");
 
     Aluno aluno;
-    printf("Qual o preiodo atual: ");
+    printf("Período atual: ");
     scanf("%d", &aluno.periodoAtual);
+    aluno.periodoAtual++; // o planejamento eh para o proximo periodo do discente
 
     limparBuffer();
+
+    if (aluno.periodoAtual < 2) // tratamento de erro para calouro
+    {
+        printf("O planejamento de matrícula só ocorre a partir do segundo semestre. Calouros são automaticamente cadastrados.\n");
+
+        return 0;
+    }
 
     aluno.numCursadas = entrada(aluno.cursadas, 0);
     aluno.numPlanejadas = 0, aluno.horasCumpridasObrigatorias = 0, aluno.horasCumpridasEletivas = 0, aluno.horasCumpridasExtensao = 0, aluno.horasCumpridasComplementares = 0;
@@ -35,6 +43,8 @@ int main()
 
     for (int i = 0; i < aluno.numPlanejadas; i++)
         printf("%s - %s (%s%c%s)\n", aluno.planejadas[i].codigo, aluno.planejadas[i].nome_dis, aluno.planejadas[i].dias, aluno.planejadas[i].turno, aluno.planejadas[i].horarios);
+
+    separarComplementares(&aluno.horasCumpridasComplementares);
 
     printf("\nCom o encerramento do semestre, a situação do discente será a seguinte:\n");
     printf("- HORAS PAGAS EM DISCIPLINAS OBRIGATÓRIAS: %dh\n- HORAS FALTANTES EM DISCIPLINAS OBRIGATÓRIAS: %dh\n", aluno.horasCumpridasObrigatorias, TOTAL_OBRIGATORIAS - aluno.horasCumpridasObrigatorias);
@@ -54,7 +64,8 @@ int main()
 void limparBuffer()
 {
     int c;
-    while ((c = getchar()) != '\n' && c != EOF);
+    while ((c = getchar()) != '\n' && c != EOF)
+        ;
 }
 
 int entrada(Historico *historico, int i)
@@ -115,7 +126,7 @@ void planejarSemestre(Aluno *aluno, Disciplina obrigatorias[], int numObrigatori
         {
             if (strcmp(aluno->cursadas[j].codigo, obrigatorias[i].codigo) == 0)
             {
-                if (aluno->cursadas[j].mediaFinal >= 7.0 &&       
+                if (aluno->cursadas[j].mediaFinal >= 7.0 &&
                     !aluno->cursadas[j].trancada) // verifica se ja cursou e foi aprovado
                 {
                     jaAprovado = true;
@@ -287,7 +298,7 @@ bool verificaPreRequisitos(Aluno *aluno, Disciplina disciplina)
         for (int j = 0; j < aluno->numCursadas; j++)
         {
             if (strcmp(disciplina.preRequisitos[i], aluno->cursadas[j].codigo) == 0 &&
-                aluno->cursadas[j].mediaFinal >=7)
+                aluno->cursadas[j].mediaFinal >= 7)
             {
                 encontrou = true;
                 break;
@@ -364,11 +375,21 @@ void extrairDiasSemana(char dias[], bool diasPresenca[5])
     {
         switch (dias[i])
         {
-            case '2': diasPresenca[0] = true; break; // segunda
-            case '3': diasPresenca[1] = true; break; // ter�a
-            case '4': diasPresenca[2] = true; break; // quarta
-            case '5': diasPresenca[3] = true; break; // quinta
-            case '6': diasPresenca[4] = true; break; // sexta
+        case '2':
+            diasPresenca[0] = true;
+            break; // segunda
+        case '3':
+            diasPresenca[1] = true;
+            break; // terca
+        case '4':
+            diasPresenca[2] = true;
+            break; // quarta
+        case '5':
+            diasPresenca[3] = true;
+            break; // quinta
+        case '6':
+            diasPresenca[4] = true;
+            break; // sexta
         }
     }
 }
@@ -403,4 +424,13 @@ bool haChoqueHorario(Aluno *aluno, char turno, char dias[5], char horarios[6]) /
     }
 
     return false;
+}
+
+void separarComplementares(double *horasComplementaresPagas)
+{
+    int complementaresPeriodo = TOTAL_COMPLEMENTARES / MAX_SEMESTRES;
+    printf("Separadas %d horas complementares para esse semestre.\n", complementaresPeriodo);
+    *horasComplementaresPagas += complementaresPeriodo;
+
+    return;
 }
