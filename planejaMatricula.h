@@ -31,4 +31,7 @@ bool verificaDiasSemana(Aluno *aluno);
 // Verifica se uma disciplina a ser adicionada possui choque de horário com alguma disciplina previamente planejada.
 bool haChoqueHorario(Aluno *aluno, char turno, char dias[5], char horarios[6]);
 
+// Separa a quantidade de horas complementares que o discente irá pagar no semestre;
+void separarComplementares(double *horasComplementaresPagas);
+
 #endif
