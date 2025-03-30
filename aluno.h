@@ -4,8 +4,11 @@
 
 int TOTAL_OBRIGATORIAS = 2376;
 int TOTAL_ELETIVAS = 576;
-int TOTAL_EXTENSAO = 240;
-int TOTAL_COMPLEMENTARES = 375;
+int TOTAL_EXTENSAO = 375;
+int TOTAL_COMPLEMENTARES = 240;
+
+int MAX_SEMESTRES = 10;
+
 typedef struct
 {
     char codigo[8];
