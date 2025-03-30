@@ -8,7 +8,7 @@ int TOTAL_EXTENSAO = 240;
 int TOTAL_COMPLEMENTARES = 375;
 typedef struct
 {
-    char codigo[10];
+    char codigo[8];
     double mediaFinal;
     bool trancada;
 } Historico;
