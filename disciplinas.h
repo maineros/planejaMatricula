@@ -7,9 +7,9 @@ typedef struct
     char codigo[8];
     char nome_dis[100];
     int periodo;
-    char preRequisitos[5][10];
+    char preRequisitos[5][8];
     int numPreRequisitos;
-    char coRequisitos[5][10];
+    char coRequisitos[5][8];
     int numCoRequisitos;
     char dias[4];
     char turno;
