@@ -20,7 +20,7 @@ bool verificaMax3PorDia(Aluno *aluno);
 bool disciplinaJaCursada(Aluno *aluno, Disciplina disciplina);
 
 // Planeja o semestre do discente.
-void planejarSemestre(Aluno *aluno, Disciplina obrigatorias[], int num_obrigatorias);
+void planejarSemestre(Aluno *aluno, Disciplina obrigatorias[], int numObrigatorias, int numEletivas);
 
 // Verifica para quais dias da semana o discente possui aulas planejadas.
 void extrairDiasSemana(char horario[], bool dias[5]);
