@@ -2,30 +2,40 @@
 #define ALUNO_H
 #include "disciplinas.h"
 
-int TOTAL_OBRIGATORIAS = 2376;
-int TOTAL_ELETIVAS = 576;
-int TOTAL_EXTENSAO = 375;
-int TOTAL_COMPLEMENTARES = 240;
+#define TOTAL_OBRIGATORIAS 2016
+#define TOTAL_ELETIVAS 936 // 576 de eletivas 'comuns' + 360 de eletivas de enfase, pois ainda nao estamos diferenciando
+#define TOTAL_EXTENSAO 375
+#define TOTAL_COMPLEMENTARES 240
 
-int MAX_SEMESTRES = 10;
+#define TOTAL_DISCIPLINAS 60 // total de disciplinas durante toda a graduacao
+#define DISCIPLINAS_POR_PERIODO 6
+#define MAX_PERIODOS 10
 
-typedef struct
+#define MAXIMO_HORAS 540 // maximo de carga horaria por semestre
+
+typedef struct Historico
 {
     char codigo[8];
     double mediaFinal;
     bool trancada;
 } Historico;
-typedef struct
+typedef struct Aluno
 {
     int periodoAtual;
     Historico cursadas[100];
     int numCursadas;
-    Disciplina planejadas[6];
-    int numPlanejadas;
     int horasCumpridasObrigatorias;
     int horasCumpridasEletivas;
     int horasCumpridasExtensao;
     int horasCumpridasComplementares;
 } Aluno;
+typedef struct Periodo
+{
+    int periodo;
+    Disciplina planejadas[6];
+    int numPlanejadas;
+    int numHoras;
+    bool dias[5];
+} Periodo;
 
 #endif
