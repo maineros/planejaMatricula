@@ -32,8 +32,7 @@ int main()
     aluno.horasCumpridasObrigatorias = 0, aluno.horasCumpridasEletivas = 0, aluno.horasCumpridasExtensao = 0, aluno.horasCumpridasComplementares = 0;
     aluno.numCursadas = entrada(aluno.cursadas, 0, &aluno);
 
-    planejarSemestre(&aluno, periodo, aluno.periodoAtual);
-
+    planejarSemestre(&aluno, periodo, aluno.periodoAtual, true);
     imprimirSemestre(&aluno, periodo, 0, 1);
 
     printf("\nCom o encerramento do semestre, a situação do discente será a seguinte:\n");
@@ -44,20 +43,13 @@ int main()
 
     printf("\n----------------------------------------------------------\n");
 
-   /*
-    if (!verificaDiasSemana(&aluno))
-        printf("Atenção: O aluno não está indo todos os dias da semana.\n");
-
-    if (!verificaMax3PorDia(&aluno))
-        printf("Atenção: O aluno está excedendo o limite de três disciplinas por dia.\n");
-   */
-
     char continuar;
     printf("\nDeseja visualizar o planejamento para os próximos semestres? (S/N) ");
     scanf("%c", &continuar);
 
     if (continuar == 'S' || continuar == 's')
     {
+        planejarSemestre(&aluno, periodo, aluno.periodoAtual, false);
         imprimirSemestre(&aluno, periodo, 1, numPeriodosFaltantes);
         printf("\n----------------------------------------------------------\n");
     }
@@ -163,7 +155,7 @@ void atualizarHorasCumpridas(Aluno *aluno, const char *codigo, double mediaFinal
     }
 }
 
-void planejarSemestre(Aluno *aluno, Periodo *periodo, int atual)
+void planejarSemestre(Aluno *aluno, Periodo *periodo, int atual, bool parada)
 {
     if (aluno->periodoAtual > 10)
         return;
@@ -178,10 +170,6 @@ void planejarSemestre(Aluno *aluno, Periodo *periodo, int atual)
         if (obrigatorias[i].periodo > aluno->periodoAtual &&
             aluno->periodoAtual < 7) // verifica periodo
             continue;
-
-        bool temCoRequisito = false;
-        if (verificaCoRequisitos(aluno, obrigatorias, periodo, idxPeriodo, i))
-            temCoRequisito = true;
 
         bool jaAprovado = false;
 
@@ -213,8 +201,6 @@ void planejarSemestre(Aluno *aluno, Periodo *periodo, int atual)
         bool diasDisciplina[5] = {false}; // array para garantir que nao exceda 3 disciplinas por dia
         extrairDiasSemana(obrigatorias[i].dias, diasDisciplina); // marca com true os dias que tem aula
 
-        // verificarDias(obrigatorias[i].dias, diasDisciplina, teste, false);
-
         bool diaLimiteExcedido = false;
         for (int dia = 0; dia < 5; dia++)
         {
@@ -245,48 +231,10 @@ void planejarSemestre(Aluno *aluno, Periodo *periodo, int atual)
         if ((periodo[idxPeriodo].numHoras + obrigatorias[i].cargaHoraria) > MAXIMO_HORAS)
             break;
 
-        if (temCoRequisito == true)
+        if (strcmp(obrigatorias[i].codigo, "COMP372")  == 0 || strcmp(obrigatorias[i].codigo, "COMP373") == 0)
         {
-            if (periodo[idxPeriodo].numPlanejadas + 2 >= 6 || 
-            (periodo[idxPeriodo].numHoras + obrigatorias[i].cargaHoraria + obrigatorias[i + 1].cargaHoraria) > MAXIMO_HORAS)
-            {
-                int proximoPeriodo = idxPeriodo + 1;
-                for (int j = i; j < i + 1; j++)
-                {
-
-                    periodo[proximoPeriodo].planejadas[periodo[idxPeriodo].numPlanejadas] = obrigatorias[j];
-
-                    periodo[proximoPeriodo].numPlanejadas++;
-
-                    periodo[proximoPeriodo].numHoras += obrigatorias[j].cargaHoraria;
-
-                    aluno->horasCumpridasObrigatorias += obrigatorias[j].cargaHoraria; // adiciona as horas da obrigatoria
-
-                    strcpy(aluno->cursadas[aluno->numCursadas].codigo, obrigatorias[j].codigo);
-                    aluno->cursadas[aluno->numCursadas].mediaFinal = 7.0;
-                    aluno->cursadas[aluno->numCursadas].trancada = false;
-                    aluno->numCursadas++;
-                }
-            }
-            else
-            {
-                for (int j = i; j < i + 1; j++)
-                {
-                    periodo[idxPeriodo].planejadas[periodo[idxPeriodo].numPlanejadas] = obrigatorias[j];
-
-                    periodo[idxPeriodo].numPlanejadas++;
-
-                    periodo[idxPeriodo].numHoras += obrigatorias[j].cargaHoraria;
-
-                    aluno->horasCumpridasObrigatorias += obrigatorias[j].cargaHoraria; // adiciona as horas da obrigatoria
-
-                    strcpy(aluno->cursadas[aluno->numCursadas].codigo, obrigatorias[j].codigo);
-                    aluno->cursadas[aluno->numCursadas].mediaFinal = 7.0;
-                    aluno->cursadas[aluno->numCursadas].trancada = false;
-                    aluno->numCursadas++;
-                }
-            }
-            continue;
+            if ((periodo[idxPeriodo].numHoras + obrigatorias[i].cargaHoraria * 2) > MAXIMO_HORAS)
+                continue;
         }
 
         periodo[idxPeriodo].planejadas[periodo[idxPeriodo].numPlanejadas] = obrigatorias[i];
@@ -331,8 +279,6 @@ void planejarSemestre(Aluno *aluno, Periodo *periodo, int atual)
         bool diasDisciplina[5] = {false};
         extrairDiasSemana(eletivas[i].dias, diasDisciplina);
 
-        // verificarDias(eletivas[i].dias, diasDisciplina, teste, true);
-
         bool diaLimiteExcedido = false;
         for (int dia = 0; dia < 5; dia++)
         {
@@ -376,7 +322,7 @@ void planejarSemestre(Aluno *aluno, Periodo *periodo, int atual)
             }
         }
 
-        // Verifica se a disciplina preenche algum dia que ainda está vazio
+        // verifica se a disciplina preenche algum dia que ainda está vazio
         bool preencheDiaVazio = false;
         for (int dia = 0; dia < 5; dia++)
         {
@@ -387,7 +333,7 @@ void planejarSemestre(Aluno *aluno, Periodo *periodo, int atual)
             }
         }
 
-        // Se a disciplina NÃO preenche um dia vazio, continue procurando outra
+        // se a disciplina NÃO preenche um dia vazio, continue procurando outra
         if (!preencheDiaVazio)
             continue;
 
@@ -404,18 +350,12 @@ void planejarSemestre(Aluno *aluno, Periodo *periodo, int atual)
         aluno->numCursadas++;
     } 
 
-    /*
-    printf("\nDisciplinas planejadas para o %d* semestre: ", aluno->periodoAtual);
-    printf("%d\n\n", teste[indicePeriodo].numPlanejadas);
-
-    for (int i = 0; i < teste[indicePeriodo].numPlanejadas; i++)
-    {
-        printf("%s - %s (%s%c%s)\n", teste[indicePeriodo].planejadas[i].codigo, teste[indicePeriodo].planejadas[i].nome_dis, teste[indicePeriodo].planejadas[i].dias, teste[indicePeriodo].planejadas[i].turno, teste[indicePeriodo].planejadas[i].horarios);
-    }
-    */
-
-    aluno->periodoAtual++;
-    planejarSemestre(aluno, periodo, atual);
+    if (parada)
+        return;
+    else
+        aluno->periodoAtual++;
+        
+    planejarSemestre(aluno, periodo, atual, parada);
 }
 
 bool verificaPreRequisitos(Aluno *aluno, Disciplina disciplina)
